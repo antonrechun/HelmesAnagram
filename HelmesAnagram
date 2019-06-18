@@ -1,0 +1,58 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class HelmesAnagram {
+
+    public static void main(String[] args) {
+        try {
+            File file = new File("test.txt");
+            Scanner sc = new Scanner(file);
+            List<String> lines = new ArrayList<>();
+            while (sc.hasNextLine()) {
+                lines.add(sc.nextLine());
+            }
+            HelmesAnagram anagram = new HelmesAnagram();
+            String[] dictionary = lines.toArray(new String[lines.size()]);
+            Collection result = anagram.collectAnagrams(dictionary, "абажур");
+            System.out.println("Result - " + result.size());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Collection collectAnagrams(String[] dictionary, String searchAnagramsFor) {
+        return Arrays
+                .stream(dictionary)
+                .filter(el -> isAnagram(el, searchAnagramsFor))
+                .collect(Collectors.toList());
+    }
+
+    private boolean isAnagram(String s1, String s2) {
+        if (s1 == null || s2 == null) {
+            return false;
+        } else if (s1.length() != s2.length()) {
+            return false;
+        }
+
+        Map<Character, Integer> occurrencesMap = new HashMap<>();
+
+        for (int i = 0; i < s1.length(); i++) {
+            char charFromLeft = s1.charAt(i);
+            int nrOfCharsInLeft = occurrencesMap.getOrDefault(charFromLeft, 0);
+            occurrencesMap.put(charFromLeft, ++nrOfCharsInLeft);
+            char charFromRight = s2.charAt(i);
+            int nrOfCharsInRight = occurrencesMap.getOrDefault(charFromRight, 0);
+            occurrencesMap.put(charFromRight, --nrOfCharsInRight);
+        }
+
+        for (int occurrencesNr : occurrencesMap.values()) {
+            if (occurrencesNr != 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
